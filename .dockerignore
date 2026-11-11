@@ -1,0 +1,5 @@
+# ignore everything, then allow only what the image needs
+*
+!app/package.json
+!app/package-lock.json
+!app/src/
