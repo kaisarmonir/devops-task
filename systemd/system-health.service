@@ -1,0 +1,16 @@
+[Unit]
+Description=System health check
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/system_health.sh --json
+StandardOutput=append:/var/log/system-health.log
+StandardError=journal
+# exit 1 is a warning, only critical (2) marks the unit as failed
+SuccessExitStatus=1
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/log
+PrivateTmp=yes
