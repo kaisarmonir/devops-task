@@ -10,7 +10,7 @@ ARG REVISION=unknown
 LABEL org.opencontainers.image.title="devops-task-app" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.revision="${REVISION}" \
-      org.opencontainers.image.source="https://github.com/kaisarmonir/devops-assessment"
+      org.opencontainers.image.source="https://github.com/kaisarmonir/devops-task"
 
 # npm, yarn and corepack are not needed at runtime,
 # removing them keeps their dependencies out of the vulnerability scan
