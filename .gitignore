@@ -2,3 +2,9 @@ node_modules/
 coverage/
 .env
 *.log
+
+# terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+tfplan

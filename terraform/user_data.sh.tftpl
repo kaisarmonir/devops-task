@@ -1,0 +1,38 @@
+#!/bin/bash
+set -euo pipefail
+
+dnf install -y docker
+systemctl enable --now docker
+
+# run-app <image>: replace the running container with <image>.
+# Used here on first boot and later by the deploy job over SSM.
+cat > /usr/local/bin/run-app <<'EOF'
+#!/bin/bash
+set -euo pipefail
+image="$1"
+
+docker pull "$image"
+docker rm -f app 2>/dev/null || true
+docker run -d --name app \
+  --restart unless-stopped \
+  -p ${port}:8080 \
+  -e APP_ENV=${env} \
+  -e APP_VERSION="$${image##*:}" \
+  --read-only --tmpfs /tmp \
+  --memory 256m --cpus 0.5 \
+  --security-opt no-new-privileges \
+  --log-driver awslogs \
+  --log-opt awslogs-region=${region} \
+  --log-opt awslogs-group=${log_group} \
+  --log-opt awslogs-stream="app-$(hostname)" \
+  "$image"
+
+# keep the previous image so the deploy job can roll back
+if [ -f /etc/app-image ]; then
+  cp /etc/app-image /etc/app-image.previous
+fi
+echo "$image" > /etc/app-image
+EOF
+chmod 0755 /usr/local/bin/run-app
+
+/usr/local/bin/run-app "${image}"
