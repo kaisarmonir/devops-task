@@ -49,6 +49,11 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
+// always fails, used to test the error metric, alert and dashboards
+app.get('/error', () => {
+  throw new Error('simulated error');
+});
+
 app.get('/metrics', async (req, res) => {
   res.set('Content-Type', metrics.register.contentType);
   res.send(await metrics.register.metrics());
