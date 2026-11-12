@@ -34,6 +34,17 @@ describe('GET /metrics', () => {
   });
 });
 
+describe('GET /error', () => {
+  it('returns 500 and counts the error', async () => {
+    const res = await request(app).get('/error');
+
+    expect(res.status).toBe(500);
+
+    const metrics = await request(app).get('/metrics');
+    expect(metrics.text).toMatch(/http_errors_total\{[^}]*route="\/error"[^}]*\} 1/);
+  });
+});
+
 describe('unknown route', () => {
   it('returns 404', async () => {
     const res = await request(app).get('/does-not-exist');
