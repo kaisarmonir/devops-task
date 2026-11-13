@@ -1,0 +1,45 @@
+groups:
+  - name: devops-task
+    rules:
+      - alert: AppDown
+        expr: up{job="app"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: App is not answering /metrics
+          description: Prometheus could not scrape {{ $labels.instance }} for 1 minute.
+
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_errors_total{route!="/metrics"}[5m]))
+            / sum(rate(http_requests_total{route!="/metrics"}[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: More than 5% of requests return 5xx
+          description: Error rate is {{ $value | humanizePercentage }} over the last 5 minutes.
+
+      - alert: HostDiskUsageHigh
+        expr: |
+          (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"}
+            / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs"}) > 0.80
+          and node_filesystem_readonly == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Disk {{ $labels.mountpoint }} is more than 80% full
+          description: Usage is {{ $value | humanizePercentage }}.
+
+      - alert: ContainerMemoryNearLimit
+        expr: |
+          container_memory_working_set_bytes{name!=""}
+            / (container_spec_memory_limit_bytes{name!=""} > 0) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Container {{ $labels.name }} is close to its memory limit
+          description: Using {{ $value | humanizePercentage }} of its limit.
