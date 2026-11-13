@@ -195,11 +195,6 @@ Region `ap-southeast-2`. The code creates, per environment:
 - Deploy access for GitHub: only `ssm:SendCommand` on this one instance (see Security)
 - On first boot, user data installs Docker and starts the app with `/usr/local/bin/run-app`
 
-The state lives in S3 (versioned, encrypted, public access blocked) with S3 native locking
-(`use_lockfile`), so no DynamoDB table is needed. `terraform/bootstrap/` creates that bucket
-once per account. Staging and production use the same code with different `envs/*.tfvars`
-and state keys.
-
 ```
 # once per account
 cd terraform/bootstrap
@@ -543,25 +538,6 @@ hadolint checks the Dockerfile. The image is small, has no npm and runs as non-r
 limits. In Kubernetes also all capabilities dropped, seccomp RuntimeDefault and no service
 account token.
 
-
-## Monthly AWS cost estimate
-
-Rough on-demand prices for ap-southeast-2 (Sydney), check with the AWS pricing calculator.
-
-**What this repo runs (one t3.small with the app and the monitoring stack):**
-- EC2 t3.small, 24/7: about $19
-- EBS gp3 20GB: about $2
-- Public IPv4 address: about $3.60
-- CloudWatch Logs (a few GB a month, 30 days retention): about $1-3
-- S3 state bucket, SSM, GHCR: about $0
-- Data transfer: the first 100GB out per month are free
-- **Total: about $25-30 per month**
-
-**A more production-like setup** (two app instances in two availability zones behind an
-Application Load Balancer, a separate small monitoring instance): about $80-100 per month.
-A 1-year Savings Plan would cut the EC2 part by roughly 30-40%.
-
-
 ## Evidence
 
 Saved command output is in `docs/evidence/`, screenshots in `docs/screenshots/`:
@@ -597,16 +573,11 @@ Local run of the Application dashboard (no errors at that time):
 - **Secrets** from AWS Secrets Manager or Parameter Store (Ansible lookup, External Secrets
   in Kubernetes) instead of git-ignored files and a test password in the repo
 - **HTTPS** for the app and Grafana (load balancer with an ACM certificate)
-- **Health script** writing and rotating its own `health_log.txt` (now systemd and
-  logrotate do that), and one `[WARNING]` line per exceeded check
-- **Image signing and SBOM** (Cosign, Syft) in the CD pipeline
 - **Monitoring on Kubernetes** with the kube-prometheus-stack Helm chart
-- **Tracing** with OpenTelemetry and Grafana Tempo
-- A **Docker socket proxy** for Alloy instead of the raw socket
 
 
 ## Use of AI tools
 
-I used Claude to draft configs and scripts and to help debug problems, and ChatGPT to
+I used Claude to draft configs and scripts and to help debug problems, also used ChatGPT to
 analyze the task and suggest an approach. I made the design choices, reviewed and tested
 every part, and can explain all of it.
