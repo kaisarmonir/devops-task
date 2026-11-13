@@ -1,0 +1,10 @@
+config:
+  LOG_LEVEL: debug
+  APP_ENV: staging
+
+autoscaling:
+  minReplicas: 2
+  maxReplicas: 3
+
+ingress:
+  host: staging.devops-task.local

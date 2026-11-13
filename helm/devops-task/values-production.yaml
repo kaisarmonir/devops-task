@@ -1,0 +1,23 @@
+config:
+  LOG_LEVEL: info
+  APP_ENV: production
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 96Mi
+  limits:
+    cpu: 500m
+    memory: 192Mi
+
+autoscaling:
+  minReplicas: 3
+  maxReplicas: 10
+
+ingress:
+  host: devops-task.local
+
+# keep 2 pods during node drains and cluster upgrades
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
