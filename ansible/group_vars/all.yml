@@ -5,4 +5,4 @@ monitoring_dir: /opt/monitoring
 grafana_admin_user: admin
 # demo password for the test env, Grafana is open to grafana_cidrs (see terraform)
 # override: -e grafana_admin_password=...
-grafana_admin_password: "123456"
+grafana_admin_password: "gRadEvopsatsK"
