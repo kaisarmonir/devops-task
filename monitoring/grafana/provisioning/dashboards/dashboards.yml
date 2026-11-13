@@ -1,0 +1,9 @@
+apiVersion: 1
+
+providers:
+  - name: devops-task
+    folder: devops-task
+    type: file
+    allowUiUpdates: false
+    options:
+      path: /var/lib/grafana/dashboards
