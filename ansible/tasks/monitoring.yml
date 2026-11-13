@@ -1,0 +1,55 @@
+# Amazon Linux 2023 has docker but no compose plugin package
+- name: Install docker compose plugin
+  ansible.builtin.get_url:
+    url: https://github.com/docker/compose/releases/download/{{ compose_version }}/docker-compose-linux-x86_64
+    checksum: sha256:https://github.com/docker/compose/releases/download/{{ compose_version }}/docker-compose-linux-x86_64.sha256
+    dest: /usr/local/lib/docker/cli-plugins/docker-compose
+    mode: "0755"
+
+- name: Create monitoring directory
+  ansible.builtin.file:
+    path: "{{ monitoring_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Copy compose files
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ monitoring_dir }}/"
+    mode: "0644"
+  loop:
+    - "{{ repo_root }}/docker-compose.monitoring.yml"
+    - files/docker-compose.server.yml
+  register: compose_files
+
+- name: Copy monitoring config
+  ansible.builtin.copy:
+    src: "{{ repo_root }}/monitoring"
+    dest: "{{ monitoring_dir }}/"
+    mode: "0644"
+    directory_mode: "0755"
+  register: monitoring_config
+
+- name: Write Grafana credentials
+  ansible.builtin.copy:
+    dest: "{{ monitoring_dir }}/.env"
+    mode: "0600"
+    content: |
+      GRAFANA_ADMIN_USER={{ grafana_admin_user }}
+      GRAFANA_ADMIN_PASSWORD={{ grafana_admin_password }}
+  no_log: true
+
+- name: Start monitoring stack
+  ansible.builtin.command:
+    cmd: docker compose -f docker-compose.monitoring.yml -f docker-compose.server.yml up -d --remove-orphans
+    chdir: "{{ monitoring_dir }}"
+  register: compose_up
+  changed_when: compose_up.stderr is search('Creat|Recreat|Start')
+
+# config files are bind mounted, containers only read them on start
+- name: Restart stack after config change
+  ansible.builtin.command:
+    cmd: docker compose -f docker-compose.monitoring.yml -f docker-compose.server.yml restart
+    chdir: "{{ monitoring_dir }}"
+  when: monitoring_config.changed and not compose_up.changed
+  changed_when: true

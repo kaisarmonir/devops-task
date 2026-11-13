@@ -20,6 +20,10 @@
       ansible.builtin.import_tasks: tasks/health.yml
       tags: health
 
+    - name: Monitoring stack
+      ansible.builtin.import_tasks: tasks/monitoring.yml
+      tags: monitoring
+
   handlers:
     - name: Check sshd config
       ansible.builtin.command: sshd -t

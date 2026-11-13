@@ -1,0 +1,7 @@
+# On EC2 the app is not started by compose but by run-app (terraform
+# user_data), which creates the "app" network. Join it instead of
+# creating a new one.
+networks:
+  app:
+    name: app
+    external: true
