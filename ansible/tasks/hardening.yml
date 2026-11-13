@@ -1,0 +1,40 @@
+- name: Install security updates
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+    security: true
+    update_only: true
+
+- name: Install logrotate
+  ansible.builtin.dnf:
+    name: logrotate
+    state: present
+
+# 10- sorts before the distro files, and the first value sshd reads wins
+- name: Harden sshd
+  ansible.builtin.copy:
+    dest: /etc/ssh/sshd_config.d/10-hardening.conf
+    mode: "0600"
+    content: |
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      X11Forwarding no
+      MaxAuthTries 3
+      AllowUsers ec2-user
+  notify: Reload sshd
+
+# ip_forward stays on, docker needs it
+- name: Network and kernel sysctl settings
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/90-hardening.conf
+    mode: "0644"
+    content: |
+      net.ipv4.conf.all.accept_redirects = 0
+      net.ipv4.conf.default.accept_redirects = 0
+      net.ipv4.conf.all.send_redirects = 0
+      net.ipv4.conf.all.accept_source_route = 0
+      net.ipv4.conf.all.log_martians = 1
+      net.ipv4.tcp_syncookies = 1
+      kernel.kptr_restrict = 2
+  notify: Apply sysctl
