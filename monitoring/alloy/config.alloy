@@ -1,0 +1,54 @@
+// find all containers through the docker socket
+discovery.docker "containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+// only a few labels, so the number of log streams stays small
+discovery.relabel "containers" {
+  targets = discovery.docker.containers.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service"
+  }
+}
+
+loki.source.docker "containers" {
+  host          = "unix:///var/run/docker.sock"
+  targets       = discovery.docker.containers.targets
+  relabel_rules = discovery.relabel.containers.rules
+  forward_to    = [loki.process.app.receiver]
+}
+
+// the app logs JSON: make level a label, keep path as metadata
+loki.process "app" {
+  stage.match {
+    selector = "{service=\"app\"}"
+
+    stage.json {
+      expressions = { level = "level", path = "path" }
+    }
+
+    stage.labels {
+      values = { level = "" }
+    }
+
+    stage.structured_metadata {
+      values = { path = "" }
+    }
+  }
+
+  forward_to = [loki.write.local.receiver]
+}
+
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
