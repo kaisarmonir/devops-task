@@ -13,8 +13,11 @@ image="$1"
 
 docker pull "$image"
 docker rm -f app 2>/dev/null || true
+# shared with the monitoring stack, so Prometheus can scrape app:8080
+docker network inspect app >/dev/null 2>&1 || docker network create app
 docker run -d --name app \
   --restart unless-stopped \
+  --network app \
   -p ${port}:8080 \
   -e APP_ENV=${env} \
   -e APP_VERSION="$${image##*:}" \
