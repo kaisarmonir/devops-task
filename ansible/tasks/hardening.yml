@@ -16,13 +16,28 @@
     dest: /etc/ssh/sshd_config.d/10-hardening.conf
     mode: "0600"
     content: |
-      PermitRootLogin no
+      PermitRootLogin prohibit-password
       PasswordAuthentication no
       KbdInteractiveAuthentication no
       X11Forwarding no
       MaxAuthTries 3
-      AllowUsers ec2-user
+      AllowUsers ec2-user root
   notify: Reload sshd
+
+# root may log in with the same key (never a password). cloud-init puts a
+# "please login as ec2-user" command in root's keys, replace it.
+- name: Create root ssh directory
+  ansible.builtin.file:
+    path: /root/.ssh
+    state: directory
+    mode: "0700"
+
+- name: Allow the ec2-user key for root
+  ansible.builtin.copy:
+    src: /home/ec2-user/.ssh/authorized_keys
+    dest: /root/.ssh/authorized_keys
+    remote_src: true
+    mode: "0600"
 
 # ip_forward stays on, docker needs it
 - name: Network and kernel sysctl settings
