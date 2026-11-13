@@ -49,6 +49,12 @@ variable "github_repo" {
   default     = "kaisarmonir/devops-task"
 }
 
+variable "github_oidc" {
+  description = "Create the GitHub deploy role (needs the OIDC provider from bootstrap)"
+  type        = bool
+  default     = true
+}
+
 variable "github_ref" {
   description = "Git ref allowed to assume the deploy role"
   type        = string

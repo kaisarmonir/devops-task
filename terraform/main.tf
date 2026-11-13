@@ -124,11 +124,34 @@ resource "aws_instance" "app" {
   }
 }
 
-# Deploy role for GitHub Actions (OIDC, no access keys).
-# Can only run shell commands on this one instance through SSM.
+# Deploy access for GitHub Actions: can only run shell commands on this
+# one instance through SSM. Used by the OIDC role, or by an IAM user when
+# the account does not allow OIDC providers (github_oidc = false).
+
+locals {
+  deploy_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "ssm:SendCommand"
+        Resource = [
+          aws_instance.app.arn,
+          "arn:aws:ssm:${var.region}::document/AWS-RunShellScript",
+        ]
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["ssm:GetCommandInvocation", "ssm:ListCommandInvocations"]
+        Resource = "*"
+      },
+    ]
+  })
+}
 
 resource "aws_iam_role" "deploy" {
-  name = "${local.name}-deploy"
+  count = var.github_oidc ? 1 : 0
+  name  = "${local.name}-deploy"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -149,25 +172,22 @@ resource "aws_iam_role" "deploy" {
 }
 
 resource "aws_iam_role_policy" "deploy" {
-  name = "ssm-deploy"
-  role = aws_iam_role.deploy.id
+  count  = var.github_oidc ? 1 : 0
+  name   = "ssm-deploy"
+  role   = aws_iam_role.deploy[0].id
+  policy = local.deploy_policy
+}
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = "ssm:SendCommand"
-        Resource = [
-          aws_instance.app.arn,
-          "arn:aws:ssm:${var.region}::document/AWS-RunShellScript",
-        ]
-      },
-      {
-        Effect   = "Allow"
-        Action   = ["ssm:GetCommandInvocation", "ssm:ListCommandInvocations"]
-        Resource = "*"
-      },
-    ]
-  })
+# Fallback: access key is created by hand (not in Terraform, so it is
+# never stored in the state file) and kept in GitHub secrets.
+resource "aws_iam_user" "deploy" {
+  count = var.github_oidc ? 0 : 1
+  name  = "${local.name}-deploy"
+}
+
+resource "aws_iam_user_policy" "deploy" {
+  count  = var.github_oidc ? 0 : 1
+  name   = "ssm-deploy"
+  user   = aws_iam_user.deploy[0].name
+  policy = local.deploy_policy
 }

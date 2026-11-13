@@ -17,6 +17,12 @@ variable "region" {
   default = "ap-southeast-2"
 }
 
+variable "github_oidc" {
+  description = "Create the GitHub OIDC provider (some org SCPs block it)"
+  type        = bool
+  default     = true
+}
+
 provider "aws" {
   region = var.region
 
@@ -61,6 +67,7 @@ resource "aws_s3_bucket_public_access_block" "state" {
 }
 
 resource "aws_iam_openid_connect_provider" "github" {
+  count          = var.github_oidc ? 1 : 0
   url            = "https://token.actions.githubusercontent.com"
   client_id_list = ["sts.amazonaws.com"]
 }

@@ -7,9 +7,13 @@ output "app_url" {
 }
 
 output "deploy_role_arn" {
-  value = aws_iam_role.deploy.arn
+  value = one(aws_iam_role.deploy[*].arn)
 }
 
 output "log_group" {
   value = aws_cloudwatch_log_group.app.name
+}
+
+output "deploy_user" {
+  value = one(aws_iam_user.deploy[*].name)
 }
