@@ -1,0 +1,68 @@
+
+PLAY [Configure the app server] ************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [54.79.192.133]
+
+TASK [Wait for cloud-init] *****************************************************
+ok: [54.79.192.133]
+
+TASK [Install security updates] ************************************************
+ok: [54.79.192.133]
+
+TASK [Install logrotate] *******************************************************
+ok: [54.79.192.133]
+
+TASK [Harden sshd] *************************************************************
+ok: [54.79.192.133]
+
+TASK [Create root ssh directory] ***********************************************
+ok: [54.79.192.133]
+
+TASK [Allow the ec2-user key for root] *****************************************
+ok: [54.79.192.133]
+
+TASK [Network and kernel sysctl settings] **************************************
+ok: [54.79.192.133]
+
+TASK [Install health script] ***************************************************
+ok: [54.79.192.133]
+
+TASK [Install systemd service and timer] ***************************************
+ok: [54.79.192.133] => (item=system-health.service)
+ok: [54.79.192.133] => (item=system-health.timer)
+
+TASK [Install logrotate config] ************************************************
+ok: [54.79.192.133]
+
+TASK [Enable health timer] *****************************************************
+ok: [54.79.192.133]
+
+TASK [Create docker cli plugin directory] **************************************
+ok: [54.79.192.133]
+
+TASK [Install docker compose plugin] *******************************************
+ok: [54.79.192.133]
+
+TASK [Create monitoring directory] *********************************************
+ok: [54.79.192.133]
+
+TASK [Copy compose files] ******************************************************
+ok: [54.79.192.133] => (item=/home/kaisar/project/myproject/devops-assessment/ansible/../docker-compose.monitoring.yml)
+ok: [54.79.192.133] => (item=files/docker-compose.server.yml)
+
+TASK [Copy monitoring config] **************************************************
+ok: [54.79.192.133]
+
+TASK [Write Grafana credentials] ***********************************************
+ok: [54.79.192.133]
+
+TASK [Start monitoring stack] **************************************************
+ok: [54.79.192.133]
+
+TASK [Restart stack after config change] ***************************************
+skipping: [54.79.192.133]
+
+PLAY RECAP *********************************************************************
+54.79.192.133              : ok=19   changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+

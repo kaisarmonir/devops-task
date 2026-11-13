@@ -1,0 +1,27 @@
+aws_instance.app: Destroying... [id=i-0bcaa9f6e52188835]
+aws_vpc_security_group_ingress_rule.grafana["0.0.0.0/0"]: Creating...
+aws_vpc_security_group_ingress_rule.ssh["203.0.113.10/32"]: Creating...
+aws_vpc_security_group_ingress_rule.ssh["203.0.113.10/32"]: Creation complete after 1s [id=sgr-00df5af349af8f473]
+aws_vpc_security_group_ingress_rule.grafana["0.0.0.0/0"]: Creation complete after 1s [id=sgr-0a3da2d6fcc9592ee]
+aws_instance.app: Still destroying... [id=i-0bcaa9f6e52188835, 00m10s elapsed]
+aws_instance.app: Still destroying... [id=i-0bcaa9f6e52188835, 00m20s elapsed]
+aws_instance.app: Still destroying... [id=i-0bcaa9f6e52188835, 00m30s elapsed]
+aws_instance.app: Destruction complete after 31s
+aws_key_pair.admin[0]: Creating...
+aws_key_pair.admin[0]: Creation complete after 0s [id=devops-task-staging-admin]
+aws_instance.app: Creating...
+aws_instance.app: Still creating... [00m10s elapsed]
+aws_instance.app: Creation complete after 14s [id=i-0c3b6daa573c0d540]
+aws_iam_user_policy.deploy[0]: Modifying... [id=devops-task-staging-deploy:ssm-deploy]
+aws_iam_user_policy.deploy[0]: Modifications complete after 2s [id=devops-task-staging-deploy:ssm-deploy]
+
+Apply complete! Resources: 4 added, 1 changed, 1 destroyed.
+
+Outputs:
+
+app_url = "http://54.79.192.133:8080"
+deploy_user = "devops-task-staging-deploy"
+grafana_url = "http://54.79.192.133:3000"
+instance_id = "i-0c3b6daa573c0d540"
+log_group = "/devops-task/staging/app"
+public_ip = "54.79.192.133"

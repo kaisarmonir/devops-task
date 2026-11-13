@@ -1,0 +1,53 @@
+
+PLAY [Configure the app server] ************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [54.79.192.133]
+
+TASK [Wait for cloud-init] *****************************************************
+ok: [54.79.192.133]
+
+TASK [Install security updates] ************************************************
+ok: [54.79.192.133]
+
+TASK [Install logrotate] *******************************************************
+ok: [54.79.192.133]
+
+TASK [Harden sshd] *************************************************************
+changed: [54.79.192.133]
+
+TASK [Create root ssh directory] ***********************************************
+ok: [54.79.192.133]
+
+TASK [Allow the ec2-user key for root] *****************************************
+changed: [54.79.192.133]
+
+TASK [Network and kernel sysctl settings] **************************************
+changed: [54.79.192.133]
+
+TASK [Install health script] ***************************************************
+changed: [54.79.192.133]
+
+TASK [Install systemd service and timer] ***************************************
+changed: [54.79.192.133] => (item=system-health.service)
+changed: [54.79.192.133] => (item=system-health.timer)
+
+TASK [Install logrotate config] ************************************************
+changed: [54.79.192.133]
+
+TASK [Enable health timer] *****************************************************
+changed: [54.79.192.133]
+
+TASK [Install docker compose plugin] *******************************************
+[ERROR]: Task failed: Module failed: Destination /usr/local/lib/docker/cli-plugins does not exist
+Origin: /home/kaisar/project/myproject/devops-assessment/ansible/tasks/monitoring.yml:2:3
+
+1 # Amazon Linux 2023 has docker but no compose plugin package
+2 - name: Install docker compose plugin
+    ^ column 3
+
+fatal: [54.79.192.133]: FAILED! => {"changed": false, "checksum_dest": null, "checksum_src": "201b397bc54ce9c0d2ca8e93a8d3b6b8b6177bec", "dest": "/usr/local/lib/docker/cli-plugins/docker-compose", "elapsed": 0, "msg": "Destination /usr/local/lib/docker/cli-plugins does not exist", "src": "/root/.ansible/tmp/ansible-moduletmp-1794573640.7020082-enr3p4il/tmpm81q5yaz", "url": "https://github.com/docker/compose/releases/download/v5.7.1/docker-compose-linux-x86_64"}
+
+PLAY RECAP *********************************************************************
+54.79.192.133              : ok=12   changed=7    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0   
+

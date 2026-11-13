@@ -1,0 +1,16 @@
+
+remote: cat /etc/app-image -> Success
+currently running: ghcr.io/kaisarmonir/devops-task:sha-c7a20b2
+deploying: ghcr.io/kaisarmonir/devops-task:sha-c7a20b2
+sha-c7a20b2: Pulling from kaisarmonir/devops-task
+Digest: sha256:c319b73977c52f8d3cd2c15ecf0f26e317291b1dc4eeba4a9e03998dfe0588a6
+Status: Image is up to date for ghcr.io/kaisarmonir/devops-task:sha-c7a20b2
+ghcr.io/kaisarmonir/devops-task:sha-c7a20b2
+app
+cbbe036d4be2c5693495ea755d54494d99b491e6306f9e155464150beee1eed7
+
+
+remote: /usr/local/bin/run-app ghcr.io/kaisarmonir/devops-task:sha-c7a20b2 -> Success
+{"status":"ok"}
+{"message":"Hello from DevOps Task!","status":"running","version":"sha-c7a20b2"}
+deploy succeeded: ghcr.io/kaisarmonir/devops-task:sha-c7a20b2

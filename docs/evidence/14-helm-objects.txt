@@ -1,0 +1,20 @@
+NAME                          READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/devops-task   2/2     2            2           144m
+
+NAME                                              REFERENCE                TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/devops-task   Deployment/devops-task   cpu: 23%/70%   2         3         2          144m
+
+NAME                                    CLASS                 HOSTS                       ADDRESS                            PORTS   AGE
+ingress.networking.k8s.io/devops-task   cloud-provider-kind   staging.devops-task.local   172.19.0.5,fc00:f853:ccd:e793::5   80      144m
+
+NAME                          READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/devops-task   3/3     3            3           14s
+
+NAME                                              REFERENCE                TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/devops-task   Deployment/devops-task   cpu: <unknown>/70%   3         10        1          14s
+
+NAME                                     MIN AVAILABLE   MAX UNAVAILABLE   ALLOWED DISRUPTIONS   AGE
+poddisruptionbudget.policy/devops-task   2               N/A               1                     15s
+
+NAME                                    CLASS                 HOSTS               ADDRESS                            PORTS   AGE
+ingress.networking.k8s.io/devops-task   cloud-provider-kind   devops-task.local   172.19.0.6,fc00:f853:ccd:e793::6   80      14s
