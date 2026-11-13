@@ -32,7 +32,8 @@ resource "aws_vpc_security_group_ingress_rule" "app" {
   to_port           = var.app_port
 }
 
-# SSH (for Ansible) and Grafana, only from admin IPs. Empty list = closed.
+# SSH (for Ansible) only from admin IPs, Grafana from grafana_cidrs.
+# Empty list = closed.
 resource "aws_vpc_security_group_ingress_rule" "ssh" {
   for_each          = toset(var.admin_cidrs)
   security_group_id = aws_security_group.app.id
@@ -44,9 +45,9 @@ resource "aws_vpc_security_group_ingress_rule" "ssh" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "grafana" {
-  for_each          = toset(var.admin_cidrs)
+  for_each          = toset(var.grafana_cidrs)
   security_group_id = aws_security_group.app.id
-  description       = "grafana from admin"
+  description       = "grafana"
   cidr_ipv4         = each.value
   ip_protocol       = "tcp"
   from_port         = 3000

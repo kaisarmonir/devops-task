@@ -39,7 +39,13 @@ variable "allowed_cidrs" {
 }
 
 variable "admin_cidrs" {
-  description = "Who can reach SSH (Ansible) and Grafana, e.g. [\"1.2.3.4/32\"]"
+  description = "Who can reach SSH (Ansible), e.g. [\"1.2.3.4/32\"]"
+  type        = list(string)
+  default     = []
+}
+
+variable "grafana_cidrs" {
+  description = "Who can reach Grafana on port 3000"
   type        = list(string)
   default     = []
 }

@@ -3,6 +3,6 @@ compose_version: v5.7.1
 monitoring_dir: /opt/monitoring
 
 grafana_admin_user: admin
-# demo password, port 3000 is only open to admin_cidrs (see terraform)
+# demo password for the test env, Grafana is open to grafana_cidrs (see terraform)
 # override: -e grafana_admin_password=...
 grafana_admin_password: "123456"
