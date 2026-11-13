@@ -1,4 +1,10 @@
 # Amazon Linux 2023 has docker but no compose plugin package
+- name: Create docker cli plugin directory
+  ansible.builtin.file:
+    path: /usr/local/lib/docker/cli-plugins
+    state: directory
+    mode: "0755"
+
 - name: Install docker compose plugin
   ansible.builtin.get_url:
     url: https://github.com/docker/compose/releases/download/{{ compose_version }}/docker-compose-linux-x86_64
