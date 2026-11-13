@@ -1,0 +1,17 @@
+# Served by cloud-provider-kind (see scripts/kind_up.sh), no extra
+# ingress controller needed. Address: kubectl -n devops-task get ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app
+                port:
+                  name: http
