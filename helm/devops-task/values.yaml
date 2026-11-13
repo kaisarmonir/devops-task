@@ -1,0 +1,38 @@
+image:
+  repository: ghcr.io/kaisarmonir/devops-task
+  tag: sha-c7a20b2
+  pullPolicy: IfNotPresent
+
+# ignored while autoscaling is enabled
+replicaCount: 2
+
+config:
+  LOG_LEVEL: info
+  APP_ENV: default
+
+# goes into a Secret. Pass values with --set secretEnv.API_TOKEN=...,
+# never put real values in a values file
+secretEnv: {}
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 250m
+    memory: 128Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  cpuPercent: 70
+
+ingress:
+  enabled: true
+  className: ""
+  host: ""
+
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
