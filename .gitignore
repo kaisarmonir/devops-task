@@ -8,3 +8,6 @@ coverage/
 *.tfstate
 *.tfstate.*
 tfplan
+
+# kubernetes
+k8s/secret.env
