@@ -2,6 +2,8 @@
 - name: Configure the app server
   hosts: all
   become: true
+  # still reload sshd / apply sysctl when a later task fails
+  force_handlers: true
 
   pre_tasks:
     # user_data installs docker on first boot, wait until it is done
@@ -37,5 +39,5 @@
       listen: Reload sshd
 
     - name: Apply sysctl
-      ansible.builtin.command: sysctl --system
+      ansible.builtin.command: sysctl -p /etc/sysctl.d/90-hardening.conf
       changed_when: true
