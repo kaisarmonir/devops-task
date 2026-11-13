@@ -6,6 +6,14 @@ output "app_url" {
   value = "http://${aws_instance.app.public_ip}:${var.app_port}"
 }
 
+output "public_ip" {
+  value = aws_instance.app.public_ip
+}
+
+output "grafana_url" {
+  value = "http://${aws_instance.app.public_ip}:3000"
+}
+
 output "deploy_role_arn" {
   value = one(aws_iam_role.deploy[*].arn)
 }

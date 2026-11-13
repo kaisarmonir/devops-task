@@ -14,7 +14,7 @@ data "aws_ssm_parameter" "al2023" {
   name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
 }
 
-# Security group: app port in, HTTPS out (GHCR, SSM, CloudWatch, dnf)
+# Security group: app port in, HTTPS out (GHCR, Docker Hub, SSM, CloudWatch, dnf)
 
 resource "aws_security_group" "app" {
   name        = local.name
@@ -30,6 +30,27 @@ resource "aws_vpc_security_group_ingress_rule" "app" {
   ip_protocol       = "tcp"
   from_port         = var.app_port
   to_port           = var.app_port
+}
+
+# SSH (for Ansible) and Grafana, only from admin IPs. Empty list = closed.
+resource "aws_vpc_security_group_ingress_rule" "ssh" {
+  for_each          = toset(var.admin_cidrs)
+  security_group_id = aws_security_group.app.id
+  description       = "ssh from admin"
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 22
+  to_port           = 22
+}
+
+resource "aws_vpc_security_group_ingress_rule" "grafana" {
+  for_each          = toset(var.admin_cidrs)
+  security_group_id = aws_security_group.app.id
+  description       = "grafana from admin"
+  cidr_ipv4         = each.value
+  ip_protocol       = "tcp"
+  from_port         = 3000
+  to_port           = 3000
 }
 
 resource "aws_vpc_security_group_egress_rule" "https" {
@@ -89,11 +110,18 @@ resource "aws_iam_instance_profile" "app" {
 
 # Instance
 
+resource "aws_key_pair" "admin" {
+  count      = var.ssh_public_key == "" ? 0 : 1
+  key_name   = "${local.name}-admin"
+  public_key = var.ssh_public_key
+}
+
 resource "aws_instance" "app" {
   ami                    = data.aws_ssm_parameter.al2023.value
   instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.app.id]
   iam_instance_profile   = aws_iam_instance_profile.app.name
+  key_name               = one(aws_key_pair.admin[*].key_name)
 
   user_data = templatefile("${path.module}/user_data.sh.tftpl", {
     image     = var.app_image

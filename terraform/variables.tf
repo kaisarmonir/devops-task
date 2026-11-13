@@ -38,6 +38,18 @@ variable "allowed_cidrs" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "admin_cidrs" {
+  description = "Who can reach SSH (Ansible) and Grafana, e.g. [\"1.2.3.4/32\"]"
+  type        = list(string)
+  default     = []
+}
+
+variable "ssh_public_key" {
+  description = "Public key for ec2-user, empty = no key pair"
+  type        = string
+  default     = ""
+}
+
 variable "log_retention_days" {
   type    = number
   default = 14
